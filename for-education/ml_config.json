@@ -1,0 +1,26 @@
+{
+    "samples": {
+        "signal": {
+            "dsids": [301209],
+            "nevents": 10000
+        },
+        "background": {
+            "dsids": [700323, 700324, 700325, 700470, 700471, 700472, 410219, 700589, 700602, 601624, 601628],
+            "nevents": 10000
+        }
+    },
+
+    "variables": [
+        "lep_pt",
+        "lep_eta",
+        "lep_phi",
+        "lep_e",
+        "lep_n"
+    ],
+
+    "options": {
+        "lumi": 36,
+        "skim": "2muons",
+        "checkpoint_dir": "blackbox_checkpoint_ml"
+    }
+}
