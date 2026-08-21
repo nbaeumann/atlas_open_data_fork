@@ -2,11 +2,11 @@
     "samples": {
         "signal": {
             "dsids": [301209],
-            "nevents": 1000
+            "nevents": 14000
         },
         "background": {
             "dsids": [700323, 700324, 700325, 700470, 700471, 700472, 410219, 700589, 700602, 601624, 601628],
-            "nevents": 1000000
+            "nevents": 14000000
         }
     },
 
@@ -22,28 +22,6 @@
         "jet_phi",
         "jet_e",
         "jet_n",
-
-        "tau_pt",
-        "tau_eta",
-        "tau_phi",
-        "tau_e",
-        "tau_n",
-
-        "photon_pt",
-        "photon_eta",
-        "photon_phi",
-        "photon_e",
-        "photon_n",
-
-        "largeRJet_pt",
-        "largeRJet_eta",
-        "largeRJet_phi",
-        "largeRJet_e",
-
-        "ScaleFactor_ElTRIGGER",
-        "ScaleFactor_FTAG",
-
-        "trigP",
 
         "met"
     ],
