@@ -7,9 +7,7 @@ if [ -z "$ENV_FILE" ]; then
     exit 1
 fi
 
-# ---------------------------------------------------------
-# Read environment name and Python version
-# ---------------------------------------------------------
+# read environment name and Python version
 
 ENV_NAME=$(grep '^name:' "$ENV_FILE" | awk '{print $2}')
 PYTHON_VERSION=$(grep '^python:' "$ENV_FILE" | awk '{print $2}')
@@ -17,9 +15,7 @@ PYTHON_VERSION=$(grep '^python:' "$ENV_FILE" | awk '{print $2}')
 echo "Environment: $ENV_NAME"
 echo "Python:      $PYTHON_VERSION"
 
-# ---------------------------------------------------------
-# Check that we are not currently in the environment
-# ---------------------------------------------------------
+# check that we are not currently in the environment
 
 CURRENT_ENV=$(pyenv version-name)
 
@@ -33,9 +29,7 @@ if [ "$CURRENT_ENV" = "$ENV_NAME" ]; then
     exit 1
 fi
 
-# ---------------------------------------------------------
-# Remove existing environment
-# ---------------------------------------------------------
+# remove existing environment
 
 if pyenv versions --bare | grep -q "^${ENV_NAME}$"; then
 
@@ -46,9 +40,7 @@ if pyenv versions --bare | grep -q "^${ENV_NAME}$"; then
     pyenv uninstall -f "$ENV_NAME"
 fi
 
-# ---------------------------------------------------------
-# Install Python if necessary
-# ---------------------------------------------------------
+# install Python if necessary
 
 if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
 
@@ -58,9 +50,7 @@ if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
     pyenv install "$PYTHON_VERSION"
 fi
 
-# ---------------------------------------------------------
-# Create environment
-# ---------------------------------------------------------
+# create environment
 
 echo ""
 echo "Creating environment '$ENV_NAME'..."
@@ -72,9 +62,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# ---------------------------------------------------------
-# Get path of NEW environment
-# ---------------------------------------------------------
+# get path of new environment
 
 ENV_PATH=$(pyenv prefix "$ENV_NAME")
 
@@ -82,7 +70,7 @@ echo ""
 echo "New environment:"
 echo "$ENV_PATH"
 
-# Use Python and pip DIRECTLY from the new environment
+# use Python and pip directly from the new environment
 ENV_PYTHON="$ENV_PATH/bin/python"
 ENV_PIP="$ENV_PATH/bin/pip"
 
@@ -94,9 +82,7 @@ echo ""
 echo "Pip executable:"
 echo "$ENV_PIP"
 
-# ---------------------------------------------------------
-# Extract pip packages from YAML
-# ---------------------------------------------------------
+# extract pip packages from txt
 
 TEMP_REQUIREMENTS=$(mktemp)
 
@@ -123,9 +109,7 @@ echo "----------------------------------------"
 cat "$TEMP_REQUIREMENTS"
 echo "----------------------------------------"
 
-# ---------------------------------------------------------
-# Install packages into NEW environment
-# ---------------------------------------------------------
+# install packages into new environment
 
 echo ""
 echo "Installing packages into $ENV_NAME..."
@@ -143,9 +127,7 @@ fi
 
 rm "$TEMP_REQUIREMENTS"
 
-# ---------------------------------------------------------
-# Verify installation
-# ---------------------------------------------------------
+# verify installation
 
 echo ""
 echo "========================================"
