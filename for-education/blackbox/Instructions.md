@@ -5,9 +5,18 @@
 ## Set up the environment
 - clone repo
 - go to directory
+```
+git clone https://github.com/atlas-outreach-data-tools/notebooks-collection-opendata atlas-open-data
+cd atlas-open-data/for-education/blackbox
+```
 
 - install pyenv
 - install packages (from list)
+```
+chmod +x create_environment.sh
+./create_environment.sh environment.txt
+pyenv activate blackbox
+```
 
 
 ## Specify your parameters in the config
@@ -19,6 +28,9 @@
 
 ## Run the code to create the black box
 - command to run the code
+```
+python create_blackbox.py your_config.json
+```
 - explain print statements
 - explain output
 
