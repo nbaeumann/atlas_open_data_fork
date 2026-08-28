@@ -11,10 +11,9 @@ import matplotlib.pyplot as plt # for plotting
 import json
 
 
-def get_inclusive_yield(metadata, lumi):
+def get_inclusive_yield(metadata):
     return (
-        lumi * 1000
-        * metadata["cross_section_pb"]
+        metadata["cross_section_pb"]
         * metadata["genFiltEff"]
         * metadata["kFactor"]
     )
@@ -65,7 +64,7 @@ def create_objects(data, variables):
     return objects
 
 
-def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, lumi=36, 
+def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, 
                     skim="noskim", checkpoint_dir="blackbox_checkpoint",):
     
     print("Variables:", variables)
@@ -102,7 +101,7 @@ def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_ne
     for dsid in signal_dsid_list:
 
         metadata = atom.get_metadata(dsid)
-        inc_yield = get_inclusive_yield(metadata, lumi)
+        inc_yield = get_inclusive_yield(metadata)
 
         yield_dict[dsid] = inc_yield
         signal_yield_sum += inc_yield
@@ -111,7 +110,7 @@ def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_ne
     for dsid in background_dsid_list:
 
         metadata = atom.get_metadata(dsid)
-        inc_yield = get_inclusive_yield(metadata, lumi)
+        inc_yield = get_inclusive_yield(metadata)
 
         yield_dict[dsid] = inc_yield
         background_yield_sum += inc_yield
@@ -317,11 +316,10 @@ if __name__ == '__main__':
 
     variables = config["variables"]
 
-    lumi = config["options"]["lumi"]
     skim = config["options"]["skim"]
     checkpoint_dir = config["options"]["checkpoint_dir"]
 
     create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, 
-                    skim=skim, lumi=lumi, checkpoint_dir=checkpoint_dir)
+                    skim=skim, checkpoint_dir=checkpoint_dir)
 
     sys.exit(0)

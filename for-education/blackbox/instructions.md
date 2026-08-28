@@ -20,10 +20,11 @@ pyenv activate blackbox
 
 
 ## Specify your parameters in the config
-- decide on signal, background -> where to find DSIDs
-- what variables -> link page with names
-- nevents, skim, lumi
-- directory name
+In the config file, the content of the black box is specified.
+First, you can define the signal and background DSIDs. An overview of the available 13 TeV 2025 data can be found [here](https://opendata.atlas.cern/docs/data/for_education/13TeV25_metadata/#). In addition, the number of signal and background events has to be specified.
+Next, the desired variables are listed. [Here](https://opendata.atlas.cern/docs/data/for_education/13TeV25_details/#), you can find all available variable names, as well as the possible skims, which act as a preselection for the events.
+
+Finally, the name of the output directory is defined.
 
 
 ## Run the code to create the black box
@@ -31,7 +32,8 @@ Now you can run the code with your config:
 ```
 python create_blackbox.py your_config.json
 ```
-A checkpoint directory is created which holds in the `events` sub directory the events of each DSID saved in a parquet file once it is finished. When all DSIDs are processed all events are combined and shuffeled. the event variables are saves in `blackbox_data.parquet` while the labels are stored in `blackbox_labels.parquet`. In the notebook `!!!` you can find an example how to load the black box and explore the output.
+A checkpoint directory is created. In its events subdirectory, the events for each DSID are stored in a Parquet file once processing of the DSID is complete. Once all DSIDs have been processed, all events are combined and shuffled. The event variables are saved in blackbox_data.parquet, while the labels are stored in blackbox_labels.parquet.
+In the notebook !!!, you can find an example of how to load the black box and explore the output.
 
 
 ## Example: Z'->\mu\mu

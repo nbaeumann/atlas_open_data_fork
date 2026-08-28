@@ -27,8 +27,7 @@
     ],
 
     "options": {
-        "lumi": 36,
         "skim": "2muons",
-        "checkpoint_dir": "blackbox_checkpoint"
+        "checkpoint_dir": "Zprime_blackbox_checkpoint"
     }
 }
