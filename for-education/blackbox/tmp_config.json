@@ -1,0 +1,24 @@
+{
+    "samples": {
+        "signal": {
+            "dsids": [],
+            "nevents": 1000
+        },
+        "background": {
+            "dsids": [],
+            "nevents": 1000
+        }
+    },
+
+    "variables": [
+        "lep_pt",
+        "lep_eta",
+        "lep_phi",
+        "lep_e"
+    ],
+
+    "options": {
+        "skim": "noskim",
+        "checkpoint_dir": "blackbox_checkpoint"
+    }
+}
