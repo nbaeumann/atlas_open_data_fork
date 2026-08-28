@@ -27,12 +27,11 @@ pyenv activate blackbox
 
 
 ## Run the code to create the black box
-- command to run the code
+Now you can run the code with your config:
 ```
 python create_blackbox.py your_config.json
 ```
-- explain print statements
-- explain output
+A checkpoint directory is created which holds in the `events` sub directory the events of each DSID saved in a parquet file once it is finished. When all DSIDs are processed all events are combined and shuffeled. the event variables are saves in `blackbox_data.parquet` while the labels are stored in `blackbox_labels.parquet`. In the notebook `!!!` you can find an example how to load the black box and explore the output.
 
 
 ## Example: Z'->\mu\mu
