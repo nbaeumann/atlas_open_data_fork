@@ -40,7 +40,7 @@ A checkpoint directory is created. In its events subdirectory, the events for ea
 In the notebook `explore_blackbox.ipynb`, you can find an example of how to load the black box and explore the output.
 
 
-## Example: Z'$\rightarrow\mu\mu$
+## Example: Z' $\rightarrow\mu\mu$
 - why is this interesting
 - config Zprime_config.json
     - choose signal and background DSIDs
