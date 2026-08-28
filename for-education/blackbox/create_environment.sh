@@ -32,12 +32,14 @@ fi
 # remove existing environment
 
 if pyenv versions --bare | grep -q "^${ENV_NAME}$"; then
-
     echo ""
-    echo "Environment '$ENV_NAME' already exists."
-    echo "Removing it..."
-
-    pyenv uninstall -f "$ENV_NAME"
+    echo "ERROR: Environment '$ENV_NAME' already exists."
+    echo "Please choose a different environment name or remove the existing environment manually."
+    echo ""
+    echo "To remove it manually:"
+    echo "    pyenv uninstall '$ENV_NAME'"
+    echo ""
+    exit 1
 fi
 
 # install Python if necessary
