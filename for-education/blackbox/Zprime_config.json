@@ -1,12 +1,10 @@
 {
     "samples": {
         "signal": {
-            "dsids": [301209],
-            "nevents": 140
+            "dsids": [301209]
         },
         "background": {
-            "dsids": [700323, 700324, 700325, 700470, 700471, 700472, 410219, 700589, 700602, 601624, 601628],
-            "nevents": 140000
+            "dsids": [700323, 700324, 700325, 700470, 700471, 700472, 410219, 700589, 700602, 601624, 601628]
         }
     },
 
@@ -27,7 +25,9 @@
     ],
 
     "options": {
-        "skim": "2muons",
+        "lumi": 11,
+        "signal_scale_factor": 1000,
+        "skim": "noskim",
         "checkpoint_dir": "Zprime_blackbox_checkpoint"
     }
 }

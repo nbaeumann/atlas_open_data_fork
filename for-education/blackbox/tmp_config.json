@@ -1,12 +1,10 @@
 {
     "samples": {
         "signal": {
-            "dsids": [],
-            "nevents": 1000
+            "dsids": []
         },
         "background": {
-            "dsids": [],
-            "nevents": 1000
+            "dsids": []
         }
     },
 
@@ -18,6 +16,8 @@
     ],
 
     "options": {
+        "lumi": 36,
+        "signal_scale_factor": 10,
         "skim": "noskim",
         "checkpoint_dir": "blackbox_checkpoint"
     }

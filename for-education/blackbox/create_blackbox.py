@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt # for plotting
 import json
 
 
-def get_inclusive_yield(metadata):
+def get_inclusive_yield(lumi, metadata):
     return (
-        metadata["cross_section_pb"]
+        lumi * 1000
+        * metadata["cross_section_pb"]
         * metadata["genFiltEff"]
         * metadata["kFactor"]
     )
@@ -65,7 +66,7 @@ def create_objects(data, variables):
 
 
 def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, 
-                    skim="noskim", checkpoint_dir="blackbox_checkpoint",):
+                    lumi=36., signal_scale_factor=1., skim="noskim", checkpoint_dir="blackbox_checkpoint",):
     
     print("Variables:", variables)
 
@@ -97,50 +98,70 @@ def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_ne
 
     signal_yield_sum = 0
     background_yield_sum = 0
+    nevents_per_sample_dict = {}
 
     for dsid in signal_dsid_list:
 
         metadata = atom.get_metadata(dsid)
-        inc_yield = get_inclusive_yield(metadata)
+        inc_yield = get_inclusive_yield(lumi, metadata)
 
-        yield_dict[dsid] = inc_yield
-        signal_yield_sum += inc_yield
+        yield_dict[dsid] = inc_yield * signal_scale_factor
+        signal_yield_sum += inc_yield * signal_scale_factor
 
 
     for dsid in background_dsid_list:
 
         metadata = atom.get_metadata(dsid)
-        inc_yield = get_inclusive_yield(metadata)
+        inc_yield = get_inclusive_yield(lumi, metadata)
 
         yield_dict[dsid] = inc_yield
         background_yield_sum += inc_yield
 
 
     # calculate number of events per DSID
-    nevents_per_sample_dict = {}
+    if signal_nevents is not None and background_nevents is not None:
+        
+        for dsid in signal_dsid_list:
+            nevents_per_sample = (signal_nevents / signal_yield_sum * yield_dict[dsid])
+            nevents_per_sample_dict[dsid] = nevents_per_sample
 
-    for dsid in signal_dsid_list:
-        nevents_per_sample = (signal_nevents / signal_yield_sum * yield_dict[dsid])
-        nevents_per_sample_dict[dsid] = nevents_per_sample
 
+        for dsid in background_dsid_list:
+            nevents_per_sample = (background_nevents / background_yield_sum * yield_dict[dsid])
+            nevents_per_sample_dict[dsid] = nevents_per_sample
 
-    for dsid in background_dsid_list:
-        nevents_per_sample = (background_nevents / background_yield_sum * yield_dict[dsid])
-        nevents_per_sample_dict[dsid] = nevents_per_sample
+    else:
+        background_nevents = background_yield_sum
+        nevents_per_sample_dict = yield_dict
+
+    # calculate available number of events for each sample to check if is is sufficient
+    for dsid in signal_dsid_list + background_dsid_list:
+        numevents = 0
+        metadata = atom.get_metadata(dsid)
+        file_list = atom.get_urls(dsid, skim=skim, protocol='root', cache=False)
+
+        for afile in file_list:
+            tree = uproot.open(afile + ":analysis")
+            numevents += tree.num_entries
+
+        if numevents < nevents_per_sample_dict[dsid]:
+            raise ValueError(f"WARNING: Only found {numevents} for DSID {dsid}, but {nevents_per_sample_dict[dsid]} are required. "
+                             "Select a lower luminosity or number of events or choose a looser skim.")
 
 
     # save completed DSIDs
     def save_completed_dsids():
         with open(completed_file, "w") as f:
             json.dump(sorted(completed_dsids), f, indent=2)
-        print(f"Checkpoint information saved: " f"{len(completed_dsids)} completed DSIDs")
 
     # calculate chunk size for efficient processing
-    step_size = background_nevents // len(background_dsid_list)
+    step_size = int(background_nevents) // len(background_dsid_list)
     digits = len(str(abs(step_size)))
     step_size = (step_size // 10**(digits - 2)) * 10**(digits - 2)
 
-    step_size = min(step_size, 100000)
+    print(f"stepsize: {step_size}")
+
+    step_size = min(step_size, 1000000)
     step_size = max(step_size, 100)
 
 
@@ -218,7 +239,7 @@ def create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_ne
 
         # check whether enough events were found
         if collected_events < target_events:
-            print(f"WARNING: Only found " f"{collected_events}/{target_events} events " f"for DSID {dsid}.")
+            raise ValueError(f"WARNING: Only found " f"{collected_events}/{target_events} events " f"for DSID {dsid}.")
 
         # combine chunks for this DSID
         dsid_arrays = {}
@@ -311,15 +332,40 @@ if __name__ == '__main__':
     signal_dsid_list = config["samples"]["signal"]["dsids"]
     background_dsid_list = config["samples"]["background"]["dsids"]
 
-    signal_nevents = config["samples"]["signal"]["nevents"]
-    background_nevents = config["samples"]["background"]["nevents"]
-
     variables = config["variables"]
+
+    lumi = config["options"].get("lumi")
+    signal_scale_factor = config["options"].get("signal_scale_factor")
+    signal_nevents = config["options"].get("signal_nevents")
+    background_nevents = config["options"].get("background_nevents")
 
     skim = config["options"]["skim"]
     checkpoint_dir = config["options"]["checkpoint_dir"]
 
-    create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, 
-                    skim=skim, checkpoint_dir=checkpoint_dir)
+    # check if DSID inputs are valid
+    common_dsids = set(signal_dsid_list) & set(background_dsid_list)
+    if common_dsids:
+        raise ValueError(f"WARNING: The following DSIDs are present in both signal and background: {sorted(common_dsids)}")
+
+    # check if lumi, scalefactor and number of events are valid inputs
+    is_lumi = lumi is not None or signal_scale_factor is not None
+    is_nevents = signal_nevents is not None or background_nevents is not None
+
+    if is_lumi and is_nevents:
+        raise ValueError("WARNING: Please specify either lumi and signal_scale_factor "
+        "or signal_nevents and background_nevents, not both.")
+
+    if is_lumi:
+        if lumi is None:
+            raise ValueError("WARNING: Please specify a luminosity.")
+        if signal_scale_factor is None:
+            signal_scale_factor = 1.
+        create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, 
+                        lumi, signal_scale_factor, skim=skim, checkpoint_dir=checkpoint_dir)
+
+    if is_nevents:
+        if signal_nevents is None or background_nevents is None:
+            raise ValueError("WARNING: Please specify both signal_nevents and background_nevents.")
+        create_blackbox(signal_dsid_list, background_dsid_list, variables, signal_nevents, background_nevents, skim=skim, checkpoint_dir=checkpoint_dir)
 
     sys.exit(0)
