@@ -40,6 +40,12 @@ python create_blackbox.py your_config.json
 A checkpoint directory is created. In its events subdirectory, the events for each DSID are stored in a Parquet file once processing of the DSID is complete. Once all DSIDs have been processed, all events are combined and shuffled. The event variables are saved in blackbox_data.parquet, while the labels are stored in blackbox_labels.parquet.
 
 
+## Explore the Output
+In the interactive Jupyter notebook `explore_blackbox.ipynb` you can explore the structure of the black box. An example funtion to load the black box is also included.
+
+Furthermore, you can train a neural network on the example black box $Z^{\prime} \rightarrow \mu\mu$ to classify signal and background events.
+
+
 ## Example: $Z^{\prime} \rightarrow \mu\mu$
 An example black box is created for the signal process $Z^{\prime} \rightarrow \mu\mu$. The $Z^{\prime}$ is a hypothetical boson predicted by theories beyond the Standard Model. For our example, it has the same properties as the Standard Model $Z$ boson but has a much higher mass, in this example $3000~\text{GeV}$. The example config is `Zprime_config.json`. The included background processes are Drell-Yan, tt̄, single-top and diboson processes. Basic muon and jet properties, as well as the missing transverse energy, are included as variables. The luminosity is defined to be $11~\text{fb}^{-1}$, as some datasets have not enough events available to allow a higher value. To significantly enhance the signal, the scale factor is chosen to be 1000. No skim is applied and the output directory is `Zprime_blackbox_checkpoint`.
 You can run the code to create the $Z'$ black box:
